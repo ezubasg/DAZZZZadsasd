@@ -8,6 +8,9 @@ package com.example.iqra.lmis_light;
 import android.os.AsyncTask;
 import android.util.Log;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 
@@ -17,6 +20,8 @@ import com.google.gson.Gson;
 public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
 
     HttpRequest request = null;
+
+    public  HttpClientTask(){}
 
     @Override
     protected JSONResponse doInBackground(String... urls) {
@@ -28,11 +33,12 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
             Log.d("D", urls[0]);
             Log.d("D", "Start Request");
 
+            request =  HttpRequest.get(urls[0]).basic("system", "System123");
 
-            request =  HttpRequest.get(urls[0]);
 
-            Log.d("D", "post Request");
+            Log.d("D", "post Request Code is  "+ request.body());
 
+            
             if(request.ok()){
                 String response = request.body().toString();
                 Gson gson = new Gson();
@@ -40,7 +46,6 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
             }
 
             clearRequest();
-
             return jsonResponse;
 
         } catch (Exception e) {
@@ -60,7 +65,7 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
     @Override
     protected void onPostExecute(JSONResponse result) {
         clearRequest();
-        Log.d("D", "post");
+        Log.d("D", "post  " + result.response);
         super.onPostExecute(result);
     }
 

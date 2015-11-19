@@ -103,19 +103,13 @@ public class MainActivity extends AppCompatActivity {
     private void sendMessageToDhis(String imput) {
         try {
 
-            String url = String.format("http://jsonplaceholder.typicode.com/posts/1");
-            HttpClientTask clientTask = new HttpClientTask() {
+            String url = String.format("https://play.dhis2.org/demo/api/messageConversations/QYsJDe0Xi9l");
 
-                @Override
-                protected void onPostExecute(JSONResponse result) {
-
-                        Log.d("Response", result.response);
-
-
-                }
-            };
+            HttpClientTask clientTask = new HttpClientTask();
 
             clientTask.execute(url);
+
+
 
 
         }catch (Exception e){}
