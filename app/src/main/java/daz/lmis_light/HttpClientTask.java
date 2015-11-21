@@ -1,20 +1,13 @@
-package com.example.iqra.lmis_light;
-
-/**
- * Created by iqra on 15.11.15.
- */
-
+package daz.lmis_light;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
-
 //import com.spearcom.Models.JSONResponse;
+
+import java.io.InputStream;
 
 
 public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
@@ -38,7 +31,7 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
 
             Log.d("D", "post Request Code is  "+ request.body());
 
-            
+
             if(request.ok()){
                 String response = request.body().toString();
                 Gson gson = new Gson();

@@ -1,4 +1,4 @@
-package com.example.iqra.lmis_light;
+package daz.lmis_light;
 
 import org.junit.Test;
 
