@@ -2,48 +2,73 @@ package daz.lmis_light;
 
 import android.os.AsyncTask;
 import android.util.Log;
-
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
-//import com.spearcom.Models.JSONResponse;
 
-import java.io.InputStream;
+/**
+ * Created by Zubair<rajazubair.asghar@gmail.com> on 15.11.15.;
+ */
 
 
 public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
 
-    HttpRequest request = null;
+    private Message message;
+    private String text;
+    private HttpRequest request = null;
+    private static String dhisUrl = "https://play.dhis2.org/demo/api/messageConversations.json";
+    private static String contentTypeJson = "application/json";
+    private static String userName = "system";
+    private static String passwd = "System123";
 
-    public  HttpClientTask(){}
+
+
+    public  HttpClientTask()
+    {}
 
     @Override
     protected JSONResponse doInBackground(String... urls) {
         InputStream is = null;
-        JSONResponse jsonResponse = new JSONResponse(400, "Request failed");
+        JSONResponse jsonResponse = new JSONResponse();
 
         try {
 
-            Log.d("D", urls[0]);
-            Log.d("D", "Start Request");
+            List<Map<String,String>> users = new ArrayList<Map<String,String>>();
+            users.add(new HashMap<String, String>(){{put("id", "PhzytPW3g2J");
+            }});
 
-            request =  HttpRequest.get(urls[0]).basic("system", "System123");
+            message = new Message();
+            message.setText("Following mentioned commodities required.\n" + urls[0] + "\nRegards");
+            message.setSubject("Logistic Message");
+            message.setUsers(users);
+
+            Gson gson = new Gson();
+            String payLoad = gson.toJson(message);
 
 
-            Log.d("D", "post Request Code is  "+ request.body());
+            Log.d("D"," payload is "+payLoad.trim());
+            byte[] bytePayload = payLoad.getBytes();
+            request =  HttpRequest.post(dhisUrl).
+                    basic(userName, passwd).
+                    contentType(contentTypeJson).
+                    send(payLoad.trim());
 
-
-            if(request.ok()){
-                String response = request.body().toString();
-                Gson gson = new Gson();
-                jsonResponse = gson.fromJson(response, JSONResponse.class);
+            if(request.created() || request.ok()){
+                String response = request.body();
+                jsonResponse.setStatus(200);
+                jsonResponse.setResponse(response);
+                Log.d("D", "created : "+response);
             }
 
-            clearRequest();
             return jsonResponse;
 
         } catch (Exception e) {
-            jsonResponse.status = 400;
-            jsonResponse.response = e.toString();
+            jsonResponse.setStatus(400);
+            jsonResponse.setResponse(e.getMessage());
             return jsonResponse;
         }
     }
@@ -51,15 +76,14 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        clearRequest();
         Log.d("D", "Pre");
     }
 
     @Override
     protected void onPostExecute(JSONResponse result) {
-        clearRequest();
-        Log.d("D", "post  " + result.response);
+        Log.d("D", "post  " + " RESULT IS "+result.getResponse());
         super.onPostExecute(result);
+        clearRequest();
     }
 
     @Override
@@ -69,10 +93,32 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
         super.onCancelled(jsonResponse);
     }
 
+
     private  void clearRequest(){
         if(request!=null){
             request.disconnect();
             Log.d("D", "clearRequest");
         }
     }
+
+    public  void setMessage(Message message)
+    {
+        this.message = message;
+    }
+
+    public Message getMessage()
+    {
+        return this.message;
+    }
+
+    public  void setText(String text)
+    {
+        this.text = text;
+    }
+
+    public String getText()
+    {
+        return this.text;
+    }
+
 }
