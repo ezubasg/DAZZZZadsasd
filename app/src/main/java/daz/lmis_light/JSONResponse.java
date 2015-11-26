@@ -10,6 +10,18 @@ package daz.lmis_light;
 public class JSONResponse {
     private int status;
     private String response = "";
+    private DataPopulator dataPopulator;
+
+    public DataPopulator getDataPopulator() {
+        return dataPopulator;
+    }
+
+    public void setDataPopulator(DataPopulator dataPopulator) {
+        this.dataPopulator = dataPopulator;
+    }
+
+
+
 
     public JSONResponse(){}
 

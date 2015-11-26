@@ -2,6 +2,8 @@ package daz.lmis_light;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Button;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,63 +30,9 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
     private List<Map<String,String>> users;
     private HttpRequestType requestType;
     private ProgramTaskType programTaskType;
+
     private List<String> userNames;
     private Map<String,String> userIDMapper;
-
-
-
-
-
-
-
-
-
-
-    public Map<String, String> getUserIDMapper() {
-        return userIDMapper;
-    }
-
-    public void setUserIDMapper(Map<String, String> userIDMapper) {
-        this.userIDMapper = userIDMapper;
-    }
-
-
-
-
-    public List<String> getUserNames() {
-        return userNames;
-    }
-
-    public void setUserNames(List<String> userNames) {
-        this.userNames = userNames;
-    }
-
-
-
-
-
-    public HttpRequestType getRequestType() {
-        return requestType;
-    }
-
-    public void setRequestType(HttpRequestType requestType) {
-        this.requestType = requestType;
-    }
-
-
-
-    public List<Map<String, String>> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<Map<String, String>> users) {
-        this.users = users;
-    }
-
-
-
-    public  HttpClientTask()
-    {}
 
 
     private JSONResponse postMessageToServer(String text)
@@ -102,13 +50,10 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
                 message = new Message();
                 message.setSubject("Logistic Message");
                 message.setText("Following mentioned commodities required.\n" + text + "\nRegards");
-
                 message.setUsers(users);
 
                 Gson gson = new Gson();
                 String payLoad = gson.toJson(message);
-
-
                 Log.d("D", " payload is " + payLoad.trim());
                 byte[] bytePayload = payLoad.getBytes();
                 request = HttpRequest.post(dhisMessageUrl).
@@ -116,17 +61,13 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
                         contentType(contentTypeJson).
                         send(payLoad.trim());
 
-
-
                 if (request.created() || request.ok()) {
                     String response = request.body();
                     jsonResponse.setStatus(200);
                     jsonResponse.setResponse(response);
                     Log.d("D", "created : " + response);
                     return jsonResponse;
-
                 }
-
 
             } catch (Exception e) {
                 jsonResponse.setStatus(400);
@@ -140,7 +81,6 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
 
     }
 
-
     private  void processResult(List<Map<String,String>> input)
     {
         List<String> names = new ArrayList<String>();
@@ -152,20 +92,15 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
             names.add(object.get("name"));
             nameIdMapper.put(object.get("name"),object.get("id"));
         }
-
-
         this.setUserNames(names);
         this.setUserIDMapper(nameIdMapper);
-
-        Log.d("D","Names are : " +names.toString());
-
-        Log.d("D","NamesIDMAPPER are : " +nameIdMapper.toString());
 
     }
 
     private  JSONResponse getDhisRecipients(String userType)
     {
         JSONResponse jsonResponse = new JSONResponse();
+
         if(requestType == HttpRequestType.GET)
         {
 
@@ -178,7 +113,7 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
                     Gson gson = new Gson();
 
                     DhisRecipients dhisRecipients = gson.fromJson(response,DhisRecipients.class);
-
+                    DataPopulator dataPopulator = new DataPopulator();
                     if(userType.equals("users")) {
                         jsonResponse.setResponse(dhisRecipients.getUsers().toString());
                         processResult(dhisRecipients.getUsers());
@@ -195,10 +130,11 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
 
                     }
 
-
+                    dataPopulator.setUserNames(this.getUserNames());
+                    dataPopulator.setUserIDMapper(this.getUserIDMapper());
+                    jsonResponse.setDataPopulator(dataPopulator);
                     jsonResponse.setStatus(200);
 
-                    Log.d("D", "HTTP OK  : " + jsonResponse.getResponse());
                     return  jsonResponse;
                 }
             }catch (Exception e)
@@ -209,41 +145,30 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
                 return jsonResponse;
             }
 
-
         }
             jsonResponse.setResponse("Nothing Happend ");
             return jsonResponse;
 
-
     }
     @Override
     protected JSONResponse doInBackground(String... urls) {
-        JSONResponse jsonResponse = new JSONResponse();
-
 
         if(programTaskType == ProgramTaskType.POSTMESSAGE)
         {
                 return postMessageToServer(urls[0]);
-
         }
-
         if (programTaskType == ProgramTaskType.GETRECIPIENT)
         {
-
             return getDhisRecipients(urls[0]);
         }
 
         if (programTaskType == ProgramTaskType.LOGIN)
         {
 
-
         }else
         {
-
-                return  jsonResponse;
-
+            return  null;
         }
-
 
         return null;
     }
@@ -258,7 +183,7 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
 
     @Override
     protected void onPostExecute(JSONResponse result) {
-        Log.d("D", "post  " + " RESULT IS "+result.getResponse());
+        Log.d("D", "post  " );
 
 
         super.onPostExecute(result);
@@ -308,5 +233,44 @@ public class HttpClientTask extends AsyncTask<String,Void, JSONResponse> {
     public void setProgramTaskType(ProgramTaskType programTaskType) {
         this.programTaskType = programTaskType;
     }
+
+
+    public Map<String, String> getUserIDMapper() {
+        return userIDMapper;
+    }
+
+    public void setUserIDMapper(Map<String, String> userIDMapper) {
+        this.userIDMapper = userIDMapper;
+    }
+
+    public List<String> getUserNames() {
+        return userNames;
+    }
+
+    public void setUserNames(List<String> userNames) {
+        this.userNames = userNames;
+    }
+
+
+    public HttpRequestType getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(HttpRequestType requestType) {
+        this.requestType = requestType;
+    }
+
+
+    public List<Map<String, String>> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<Map<String, String>> users) {
+        this.users = users;
+    }
+
+
+    public  HttpClientTask()
+    {}
 
 }

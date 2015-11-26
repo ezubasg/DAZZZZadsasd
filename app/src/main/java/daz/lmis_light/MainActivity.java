@@ -38,15 +38,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         sqlController = new SQLController(this);
         sqlController.open();
+
         ETcommodityName = (EditText) findViewById(R.id.ETcommodityName);
         ETquantity = (EditText) findViewById(R.id.ETquantity);
         table_layout = (TableLayout) findViewById(R.id.tableLayout1);
         makeTable();
-
-        // wen radio is clicked this method should be called
-
-        clientTask =  new HttpClientTask();
-        getDhisRecipients("organisationUnits");
+        getDhisRecipients("userGroups");
     }
 
 
@@ -99,22 +96,22 @@ public class MainActivity extends Activity {
 
     private void getDhisRecipients(String userType) {
 
-        Log.d("D","  before try");
+        clientTask =  new HttpClientTask();
+        Log.d("D", "  before try");
         try {
 
-            Log.d("D","  before exception ");
+            Log.d("D", "  before exception ");
             clientTask.setProgramTaskType(ProgramTaskType.GETRECIPIENT);
             clientTask.setRequestType(HttpRequestType.GET);
-            clientTask.execute(userType);
-            names = clientTask.getUserNames();
-            nameIdMapper = clientTask.getUserIDMapper();
+            JSONResponse jsonResponse = clientTask.execute(userType).get();
+            names = jsonResponse.getDataPopulator().getUserNames();
+            nameIdMapper = jsonResponse.getDataPopulator().getUserIDMapper();
 
-            Log.d("D","  After Execute Names are :" + names.toString());
+            Log.d("D"," data populator "+ names.toString());
+            Log.d("D"," data populator "+ nameIdMapper.toString());
 
         }catch (Exception e){
-            Log.d("D","  in Exception " );
-
-
+            Log.d("D","  IN EXCEPTIONSSSSSSSSSSSS " );
         }
     }
 
@@ -176,4 +173,9 @@ public class MainActivity extends Activity {
     public void setNameIdMapper(Map<String, String> nameIdMapper) {
         this.nameIdMapper = nameIdMapper;
     }
+
+
+
+
+
 }
