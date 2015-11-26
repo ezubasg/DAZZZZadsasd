@@ -14,6 +14,8 @@ import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+import  java.util.Map;
 //import com.google.gson.Gson;
 
 
@@ -22,6 +24,12 @@ public class MainActivity extends Activity {
     TableLayout table_layout;
     EditText ETcommodityName, ETquantity;
     SQLController sqlController;
+
+    private  List<String> names;
+    private  Map<String,String> nameIdMapper;
+    private HttpClientTask clientTask;
+
+
 
 
     @Override
@@ -34,7 +42,14 @@ public class MainActivity extends Activity {
         ETquantity = (EditText) findViewById(R.id.ETquantity);
         table_layout = (TableLayout) findViewById(R.id.tableLayout1);
         makeTable();
+
+        // wen radio is clicked this method should be called
+
+        clientTask =  new HttpClientTask();
+        getDhisRecipients("organisationUnits");
     }
+
+
 
     public void btn_addClicked(View view){
         table_layout.removeAllViews();
@@ -76,9 +91,31 @@ public class MainActivity extends Activity {
 
     private void sendMessageToDhis(String input) {
         try {
-            HttpClientTask clientTask = new HttpClientTask();
+            clientTask.setProgramTaskType(ProgramTaskType.GETRECIPIENT);
+            clientTask.setRequestType(HttpRequestType.GET);
             clientTask.execute(input);
         }catch (Exception e){}
+    }
+
+    private void getDhisRecipients(String userType) {
+
+        Log.d("D","  before try");
+        try {
+
+            Log.d("D","  before exception ");
+            clientTask.setProgramTaskType(ProgramTaskType.GETRECIPIENT);
+            clientTask.setRequestType(HttpRequestType.GET);
+            clientTask.execute(userType);
+            names = clientTask.getUserNames();
+            nameIdMapper = clientTask.getUserIDMapper();
+
+            Log.d("D","  After Execute Names are :" + names.toString());
+
+        }catch (Exception e){
+            Log.d("D","  in Exception " );
+
+
+        }
     }
 
     public void showtoast(String message)
@@ -119,5 +156,24 @@ public class MainActivity extends Activity {
             table_layout.addView(row);
         }
         sqlController.close();
+    }
+
+
+
+
+    public List<String> getNames() {
+        return names;
+    }
+
+    public void setNames(List<String> names) {
+        this.names = names;
+    }
+
+    public Map<String, String> getNameIdMapper() {
+        return nameIdMapper;
+    }
+
+    public void setNameIdMapper(Map<String, String> nameIdMapper) {
+        this.nameIdMapper = nameIdMapper;
     }
 }

@@ -10,6 +10,13 @@ import java.util.Map;
 public class Message {
 
 
+    private String subject;
+    private String text;
+    private List<Map<String,String>> users;
+    private List<Map<String,String>> userGroups;
+    private List<Map<String,String>> organisationUnits;
+
+
     public  Message()
     {}
 
@@ -37,9 +44,7 @@ public class Message {
         this.users = users;
     }
 
-    private String subject;
-    private String text;
-    private List<Map<String,String>> users;
+
 
     public List<Map<String, String>> getUserGroups() {
         return userGroups;
@@ -57,7 +62,5 @@ public class Message {
         this.organisationUnits = organisationUnits;
     }
 
-    private List<Map<String,String>> userGroups;
-    private List<Map<String,String>> organisationUnits;
 
 }
